@@ -1,4 +1,0 @@
-#ifndef IPARAM_IPARAM_H
-#define IPARAM_IPARAM_H
-
-#endif //IPARAM_IPARAM_H
