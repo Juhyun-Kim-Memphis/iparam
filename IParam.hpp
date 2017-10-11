@@ -1,7 +1,3 @@
-//
-// Created by user on 2017-10-10.
-//
-
 #ifndef IPARAM_IPARAM_HPP
 #define IPARAM_IPARAM_HPP
 
@@ -16,22 +12,19 @@ class IParam {
 
 public:
     IParam(string name_) : name(name_) {}
-    IParam() {}
 
     virtual void setValue(string in) = 0;
-    virtual bool isValid() = 0;
+    virtual bool isValid() { return  true; }
 
-    string getName() {
-        return name;
-    }
+    string getName() { return name; }
 
-    string name;
+private:
+    const string name;
 };
 
 template <typename T>
 class IParamTyped : public IParam {
 public:
-    IParamTyped() {}
     IParamTyped(string name_, T value_) : IParam(name_), value(value_) {}
 
     void setValue(string in) {
@@ -39,15 +32,13 @@ public:
         ss >> value;
     }
 
-    bool isValid() { return  true; }
-
     T value;
 };
 
 class IParamSetter {
 public:
     IParamSetter(map<string, string> m) : iParamMap(m) {}
-    void setIParamIfPossible(IParam &iparam, string iParamName);
+    void setIParamIfPossible(IParam &iparam);
     void applyAll(vector<IParam *> &iParams);
 
 private:
@@ -64,10 +55,32 @@ private:
 class IParamContainer {
 public:
     void setIParams(IParamSetter *setter);
-    void addNew(IParam *iParam);
+    void init(IParam *iParam);
 
 //private:
     vector<IParam*> iParams;
+};
+
+typedef bool(*IntPredicate)(int);
+template<IntPredicate isValidInt>
+class ConditionedIParam : public IParamTyped<int> {
+public:
+    ConditionedIParam(string name_, int value_) : IParamTyped<int>(name_, value_) {}
+    bool isValid(){
+        return isValidInt(value);
+    }
+};
+
+class DependingIParam : public IParamTyped<int> {
+public:
+    DependingIParam(string name_, int value_, const IParamTyped<int> &d)
+            : IParamTyped<int>(name_, value_), dependedIParam(d) {}
+    bool isValid() {
+        return dependedIParam.value < value;
+    }
+
+private:
+    const IParamTyped<int> &dependedIParam;
 };
 
 #endif //IPARAM_IPARAM_HPP

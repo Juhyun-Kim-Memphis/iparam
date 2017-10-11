@@ -4,15 +4,9 @@
 #include "IParam.hpp"
 #include "Module.hpp"
 
-
 using namespace std;
 
-TEST_CASE("test1") {
-    REQUIRE( 1 == 1 );
-}
-
 TEST_CASE("test module init and Default IParam value of modules") {
-    string bufferCacheSize("40");
     map<string, string> tipFileResult;
     tipFileResult["BUFFER_CACHE_SIZE"] = string("40");
     tipFileResult["BUFFER_CACHE_NAME"] = string("another_name");
@@ -26,73 +20,50 @@ TEST_CASE("test module init and Default IParam value of modules") {
     REQUIRE(bufferCache->getName() == "another_name");
 }
 
-TEST_CASE("test default value and alter system set ddl") {
+TEST_CASE("test default value and alter system set") {
     map<string, string> emptyTipFile;
     IParamContainer iParamContainer;
 
-    IParamSetter *iParamSetter =new IParamSetter(emptyTipFile);
+    IParamSetter *iParamSetter = new IParamSetter(emptyTipFile);
     MemoryManager *memoryManger = new MemoryManager(iParamSetter, &iParamContainer);
     BufferCache *bufferCache = new BufferCache(iParamSetter, &iParamContainer);
-
-    REQUIRE(memoryManger->getMemorySizeLimit() == 100);
-    REQUIRE(bufferCache->getSize() == 50);
-    REQUIRE(bufferCache->getName() == "default_value");
 
     map<string, string> alterSystemSetParsed;
     alterSystemSetParsed["BUFFER_CACHE_SIZE"] = string("999");
     alterSystemSetParsed["BUFFER_CACHE_NAME"] = string("myName");
-    IParamSetter *alterSystemSet =new IParamSetter(alterSystemSetParsed);
+    IParamSetter *alterSystemSet = new IParamSetter(alterSystemSetParsed);
     iParamContainer.setIParams(alterSystemSet);
 
-    REQUIRE(iParamContainer.iParams.size() == 3);
     REQUIRE(memoryManger->getMemorySizeLimit() == 100);
     REQUIRE(bufferCache->getSize() == 999);
     REQUIRE(bufferCache->getName() == "myName");
 }
 
 
-class ConditionedIParam : public IParamTyped<int> {
-public:
-    ConditionedIParam(string name_, int value_) : IParamTyped<int>(name_, value_) {}
-    bool isValid(){
-        return value > 200;
-    }
-};
-
-TEST_CASE("test condition check") {
-    IParam *iParam = new ConditionedIParam(string("TEST_VAL1"), 201);
-
+bool isBigger200(int val){ return val > 200; }
+TEST_CASE("test ConditionedIParam condition check") {
+    IParam *iParam = new ConditionedIParam<isBigger200>(string("TEST_VAL1"), 201);
     REQUIRE(iParam->isValid());
 }
 
-class DependingIParam : public IParamTyped<int> {
-public:
-    DependingIParam(string name_, int value_) : IParamTyped<int>(name_, value_) {}
-
-    bool isValid(const IParamTyped<int> &dependedIParam){
-        return value > dependedIParam.value;
-    }
-};
-
-
 TEST_CASE("test dependent condition check") {
-    DependingIParam *depending = new DependingIParam(string("I_SHOULD_BE_BIGGER"), 201);
-    IParamTyped<int> depended(string("DONT_KNOW_ANYTHING"), 100);
+    IParamTyped<int> depended(string("SMALLER"), 100);
+    DependingIParam *depending = new DependingIParam(string("BIGGER"), 99, depended);
 
-    REQUIRE(depending->isValid(depended));
+    REQUIRE(!depending->isValid());
+    depending->setValue(string("101"));
+    REQUIRE(depending->isValid());
 }
 
+TEST_CASE("test dependent condition check by Module") {
 
-
-TEST_CASE("test Module with default iparam") {
-    map<string, string> alterSystemSetParsed;
-    IParamSetter *iParamSetter =new IParamSetter(alterSystemSetParsed);
 }
+
 
 // TODO: condition check (simple, dependency (Memory manager <-- buffer cache))
 // TODO: condition check in "alter system set"
 // TODO: IParam with No value (no memoryOverhead) (fixAtNewMount<modifiable<dynamic)
 // TODO: to document @desc, @range, @recommend, @syntax
-//
+// TODO: bootstrapper
 
 // To Prove: customizablity of IParam, container for all iparam

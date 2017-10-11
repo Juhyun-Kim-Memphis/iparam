@@ -13,7 +13,6 @@
 
 using namespace std;
 
-
 class Module {
 public:
     Module() {}
@@ -21,7 +20,7 @@ protected:
     void addIParamsToContainer(IParamContainer *ic, vector<IParam*> &iparamsOfModule) {
         for (vector<IParam *>::iterator it = iparamsOfModule.begin() ; it != iparamsOfModule.end(); ++it){
             IParam *iParam = *it;
-            ic->addNew(iParam);
+            ic->init(iParam);
         }
     }
 
@@ -32,7 +31,7 @@ public:
     MemoryManager(IParamSetter *iParamSetter, IParamContainer *ic = NULL)
             : memorySizeLimit(string("MEMORY_SIZE_LIMIT"), 100)
     {
-        iParamSetter->setIParamIfPossible(memorySizeLimit, string("MEMORY_SIZE_LIMIT"));
+        iParamSetter->setIParamIfPossible(memorySizeLimit);
 
         //TODO: make this call to be unnecessary for concrete module;
         if(ic){
@@ -56,8 +55,8 @@ public:
             : name(string("BUFFER_CACHE_NAME"), string("default_value")),
               size(string("BUFFER_CACHE_SIZE"), 50)
     {
-        iParamSetter->setIParamIfPossible(size, string("BUFFER_CACHE_SIZE"));
-        iParamSetter->setIParamIfPossible(name, string("BUFFER_CACHE_NAME"));
+        iParamSetter->setIParamIfPossible(size);
+        iParamSetter->setIParamIfPossible(name);
 
         //TODO: make this call to be unnecessary for concrete module;
         if(ic){
