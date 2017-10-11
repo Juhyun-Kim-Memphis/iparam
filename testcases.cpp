@@ -1,3 +1,4 @@
+#include <map>
 #include "catch.hpp"
 
 #include "IParam.hpp"
@@ -11,10 +12,30 @@ TEST_CASE("test1") {
 }
 
 TEST_CASE("test module init and Default IParam value of modules") {
-    MemoryManager *memoryManger = new MemoryManager;
-    BufferCache *bufferCache = new BufferCache;
-    REQUIRE(memoryManger->memorySizeLimit.value == 100);
-    REQUIRE(bufferCache->size.value == 50);
+    string bufferCacheSize("40");
+    map<string, string> tipFileResult;
+    tipFileResult["BUFFER_CACHE_SIZE"] = string("40");
+    tipFileResult["BUFFER_CACHE_NAME"] = string("another_name");
+
+    IParamSetter *iParamSetter = new IParamSetter(tipFileResult);
+    MemoryManager *memoryManger = new MemoryManager(iParamSetter);
+    BufferCache *bufferCache = new BufferCache(iParamSetter);
+
+    REQUIRE(memoryManger->getMemorySizeLimit() == 100);
+    REQUIRE(bufferCache->getSize() == 40);
+    REQUIRE(bufferCache->getName() == "another_name");
+}
+
+TEST_CASE("test default") {
+    map<string, string> emptyTipFile;
+
+    IParamSetter *iParamSetter =new IParamSetter(emptyTipFile);
+    MemoryManager *memoryManger = new MemoryManager(iParamSetter);
+    BufferCache *bufferCache = new BufferCache(iParamSetter);
+
+    REQUIRE(memoryManger->getMemorySizeLimit() == 100);
+    REQUIRE(bufferCache->getSize() == 50);
+    REQUIRE(bufferCache->getName() == "default");
 }
 
 //TEST_CASE("test Module with default iparam") {
