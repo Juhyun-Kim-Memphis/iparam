@@ -89,12 +89,10 @@ TEST_CASE("test Module with default iparam") {
     IParamSetter *iParamSetter =new IParamSetter(alterSystemSetParsed);
 }
 
-// TODO: bootstrapper
-// TODO: bool, int, string (primitive) type iparam
-// TODO: alter system set
-// TODO: Real example Module (Memory manager <-- buffer cache)
-// TODO: tip file load
-// TODO: condition check (simple, dependency)
+// TODO: condition check (simple, dependency (Memory manager <-- buffer cache))
 // TODO: condition check in "alter system set"
+// TODO: IParam with No value (no memoryOverhead) (fixAtNewMount<modifiable<dynamic)
+// TODO: to document @desc, @range, @recommend, @syntax
+//
 
 // To Prove: customizablity of IParam, container for all iparam
