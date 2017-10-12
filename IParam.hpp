@@ -56,6 +56,13 @@ class IParamContainer {
 public:
     void setIParams(IParamSetter *setter);
     void init(IParam *iParam);
+    IParam *getVal(string iParamName){
+        for (vector<IParam *>::iterator it = iParams.begin() ; it != iParams.end(); ++it) {
+            IParam *iParam = *it;
+            if(iParam->getName() == iParamName)
+                return iParam;
+        }
+    }
 
 //private:
     vector<IParam*> iParams;
