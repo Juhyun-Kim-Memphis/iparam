@@ -3,6 +3,7 @@
 
 void IParamSetter::setIParamIfPossible(IParam &iparam) {
     string iParamName(iparam.getName());
+
     if(hasIParamNamed(iParamName))
         iparam.setValue(getValueOf(iParamName));
 }

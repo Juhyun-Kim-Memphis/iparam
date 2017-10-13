@@ -39,8 +39,6 @@ public:
     BufferCache(IParamSetter *iParamSetter, IParamContainer *ic = NULL)
         : name(string("BUFFER_CACHE_NAME"), string("myBufferCache"))
     {
-
-
         //TODO: make this call to be unnecessary for concrete module;
         if(ic){
             size = (BufferCacheSize *)ic->getVal(string("BUFFER_CACHE_SIZE"));

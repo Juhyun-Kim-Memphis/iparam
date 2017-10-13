@@ -9,7 +9,6 @@
 using namespace std;
 
 class IParam {
-
 public:
     IParam(string name_) : name(name_) {}
 
@@ -35,6 +34,9 @@ public:
     T value;
 };
 
+
+
+
 class IParamSetter {
 public:
     IParamSetter(map<string, string> m) : iParamMap(m) {}
@@ -49,6 +51,7 @@ private:
     string getValueOf(string name) {
         return iParamMap[name];
     }
+
     map<string, string> iParamMap;
 };
 
