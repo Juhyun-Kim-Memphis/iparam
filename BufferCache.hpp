@@ -10,8 +10,8 @@
 
 class BufferCacheSize : public IParamTyped<int> {
 public:
-    BufferCacheSize(string name_, int value_)
-            : IParamTyped<int>(name_, value_), ref(NULL) {}
+    BufferCacheSize(string name_, int value_, IParamTyped<int> *refIn)
+            : IParamTyped<int>(name_, value_), ref(refIn) {}
 
     void setValue(string in) {
 
@@ -43,31 +43,21 @@ private:
 
 class BufferCache : public Module {
 public:
-    BufferCache(IParamSetter *iParamSetter, IParamContainer *ic)
-        : name(string("BUFFER_CACHE_NAME"), string("myBufferCache"))
-    {
-        //TODO: make this call to be unnecessary for concrete module;
-        if(ic){
-            size = (BufferCacheSize *)ic->getVal(string("BUFFER_CACHE_SIZE"));
-            if(size)
-                iParamSetter->setIParamIfPossible(*size);
-            else{
-                size = new BufferCacheSize(string("BUFFER_CACHE_SIZE"), 50);
-                iParamSetter->setIParamIfPossible(*size);
-                ic->init(size);
-            }
 
-            iParamSetter->setIParamIfPossible(name);
-            ic->init(&name);
-        }
+    BufferCache(BufferCacheSize *in, IParamSetter &initializer)
+        : size(in), name(string("BUFFER_CACHE_NAME"), string("myBufferCache")) {
+        //TODO: make this call to be unnecessary for concrete module;
+        initializer.setIParamIfPossible(*size);
+        initializer.setIParamIfPossible(name);
     }
 
-    BufferCache(IParamSetter *iParamSetter)
-            : name(string("BUFFER_CACHE_NAME"), string("myBufferCache")) {
-        size = new BufferCacheSize(string("BUFFER_CACHE_SIZE"), 50);
+    explicit BufferCache(IParamSetter &initializer)
+            : name(string("BUFFER_CACHE_NAME"), string("myBufferCache"))  {
+        size = new BufferCacheSize(string("BUFFER_CACHE_SIZE"), 50, NULL);
+        //TODO: remove null argument here.
 
-        iParamSetter->setIParamIfPossible(name);
-        iParamSetter->setIParamIfPossible(*size);
+        initializer.setIParamIfPossible(name);
+        initializer.setIParamIfPossible(*size);
     }
 
     int getSize() {
@@ -76,6 +66,13 @@ public:
 
     string getName() {
         return name.value;
+    }
+
+    vector<IParam *> getIParams() {
+        vector<IParam *> myIParams;
+        myIParams.push_back(size);
+        myIParams.push_back(&name);
+        return myIParams;
     }
 
 private:

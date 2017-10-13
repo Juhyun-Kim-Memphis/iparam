@@ -16,12 +16,6 @@ using namespace std;
 class Module {
 public:
     Module() {}
-
-protected:
-    void addIParamsToContainer(IParamContainer *ic, vector<IParam*> &iparamsOfModule) {
-        for( IParam *i : iparamsOfModule )
-            ic->init(i);
-    }
 };
 
 #endif //IPARAM_MODULE_HPP

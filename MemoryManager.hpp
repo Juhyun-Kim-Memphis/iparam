@@ -10,21 +10,23 @@
 
 class MemoryManager : public Module {
 public:
-    MemoryManager(IParamSetter *iParamSetter, IParamContainer *ic) {
+    MemoryManager(IParamTyped<int> *memSizeLimInput, IParamSetter &initializer)
+            : memorySizeLimit(memSizeLimInput)
+    {
         //TODO: make this call to be unnecessary for concrete module;
-        if(ic){
-            memorySizeLimit = (IParamTyped<int> *)ic->getVal(string("MEMORY_SIZE_LIMIT"));
-            if(memorySizeLimit)
-                iParamSetter->setIParamIfPossible(*memorySizeLimit);
-            else {
-                memorySizeLimit = new IParamTyped<int>(string("MEMORY_SIZE_LIMIT"), 100);
-                ic->init(memorySizeLimit);
-            }
-        }
+        initializer.setIParamIfPossible(*memorySizeLimit);
+        memorySizeLimit = new IParamTyped<int>(string("MEMORY_SIZE_LIMIT"), 100);
     }
 
-    MemoryManager(IParamSetter *iParamSetter) {
+    MemoryManager(IParamSetter &initializer) {
         memorySizeLimit = new IParamTyped<int>(string("MEMORY_SIZE_LIMIT"), 100);
+        initializer.setIParamIfPossible(*memorySizeLimit);
+    }
+
+    vector<IParam *> getIParams() {
+        vector<IParam *> myIParams;
+        myIParams.push_back(memorySizeLimit);
+        return myIParams;
     }
 
     int getMemorySizeLimit() {

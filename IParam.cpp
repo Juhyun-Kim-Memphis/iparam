@@ -23,3 +23,10 @@ void IParamContainer::init(IParam *iParam) {
         iParams.push_back(iParam);
 }
 
+void IParamContainer::insert(vector<IParam *> iParams) {
+    for(auto i : iParams)
+        init(i);
+}
+
+
+

@@ -7,12 +7,12 @@
 
 using namespace std;
 
-TEST_CASE("test module init and Default IParam value of modules") {
+TEST_CASE("test module insert and Default IParam value of modules") {
     map<string, string> tipFileResult;
     tipFileResult["BUFFER_CACHE_SIZE"] = string("90");
     tipFileResult["BUFFER_CACHE_NAME"] = string("another_name");
 
-    IParamSetter *iParamSetter = new IParamSetter(tipFileResult);
+    IParamSetter iParamSetter(tipFileResult);
     MemoryManager *memoryManger = new MemoryManager(iParamSetter);
     BufferCache *bufferCache = new BufferCache(iParamSetter);
 
@@ -25,11 +25,14 @@ TEST_CASE("test default value and alter system set") {
     map<string, string> emptyTipFile;
     IParamContainer iParamContainer;
 
-    IParamSetter *iParamSetter = new IParamSetter(emptyTipFile);
-    MemoryManager *memoryManger = new MemoryManager(iParamSetter, &iParamContainer);
-    BufferCache *bufferCache = new BufferCache(iParamSetter, &iParamContainer);
+    IParamSetter iParamSetter(emptyTipFile);
+    MemoryManager *memoryManager = new MemoryManager(iParamSetter);
+    BufferCache *bufferCache = new BufferCache(iParamSetter);
 
-    REQUIRE(memoryManger->getMemorySizeLimit() == 100);
+    iParamContainer.insert(memoryManager->getIParams());
+    iParamContainer.insert(bufferCache->getIParams());
+
+    REQUIRE(memoryManager->getMemorySizeLimit() == 100);
     REQUIRE(bufferCache->getSize() == 50);
     REQUIRE(bufferCache->getName() == "myBufferCache");
 
@@ -39,7 +42,7 @@ TEST_CASE("test default value and alter system set") {
     IParamSetter *alterSystemSet = new IParamSetter(alterSystemSetParsed);
     iParamContainer.setIParams(alterSystemSet);
 
-    REQUIRE(memoryManger->getMemorySizeLimit() == 100);
+    REQUIRE(memoryManager->getMemorySizeLimit() == 100);
     REQUIRE(bufferCache->getSize() == 999);
     REQUIRE(bufferCache->getName() == "other_name");
 }
@@ -53,11 +56,11 @@ TEST_CASE("test ConditionedIParam condition check") {
 
 TEST_CASE("test dependent condition check") {
     IParamTyped<int> depended(string("SMALLER"), 100);
-    DependingIParam *depending = new DependingIParam(string("BIGGER"), 99, depended);
+    DependingIParam *depending = new DependingIParam(string("BIGGER"), 101, depended);
 
-    REQUIRE(!depending->isValid());
-    depending->setValue(string("101"));
     REQUIRE(depending->isValid());
+    depending->setValue(string("99"));
+    REQUIRE(!depending->isValid());
 }
 
 TEST_CASE("test dependent condition check by Module") {
@@ -78,6 +81,7 @@ TEST_CASE("test dependent condition check by Module") {
     alterSystemSet = new IParamSetter(alterSystemSetParsed);
     moduleFactory.iParamContainer.setIParams(alterSystemSet);
     REQUIRE(moduleFactory.bufferCache->getSize() == 40);
+    REQUIRE(moduleFactory.iParamContainer.iParams.size() == 3);
     //TODO: errormsg
 }
 

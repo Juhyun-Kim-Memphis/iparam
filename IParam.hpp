@@ -21,6 +21,7 @@ private:
     const string name;
 };
 
+
 template <typename T>
 class IParamTyped : public IParam {
 public:
@@ -33,8 +34,6 @@ public:
 
     T value;
 };
-
-
 
 
 class IParamSetter {
@@ -60,16 +59,8 @@ class IParamContainer {
 public:
     void setIParams(IParamSetter *setter);
     void init(IParam *iParam);
-    IParam *getVal(string iParamName){
-        for (vector<IParam *>::iterator it = iParams.begin() ; it != iParams.end(); ++it) {
-            IParam *iParam = *it;
-            if(iParam->getName() == iParamName)
-                return iParam;
-        }
-        return NULL;
-    }
+    void insert(vector<IParam *> iParams);
 
-//private:
     vector<IParam*> iParams;
 };
 
@@ -82,6 +73,7 @@ public:
         return isValidInt(value);
     }
 };
+
 
 class DependingIParam : public IParamTyped<int> {
 public:

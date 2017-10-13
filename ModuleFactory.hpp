@@ -14,24 +14,22 @@
 class ModuleFactory {
 public:
     void boot() {
-        //Instanciating IParam Container to store all the references for IParam objects
+        //Instantiating IParam Container to store all the references for IParam objects
         map<string, string> tipFile;
-        IParamSetter *iParamSetter = new IParamSetter(tipFile);
+        IParamSetter iParamInitializer(tipFile);
 
-        memSizeLim = new IParamTyped<int>(string("MEMORY_SIZE_LIMIT"), 100);
-        iParamContainer.init(memSizeLim);
-        memoryManager = new MemoryManager(iParamSetter,&iParamContainer);
+        IParamTyped<int> *memSizeLim = new IParamTyped<int>(string("MEMORY_SIZE_LIMIT"), 100);
+        memoryManager = new MemoryManager(memSizeLim, iParamInitializer);
 
-        bufCacheSize = new BufferCacheSize(string("BUFFER_CACHE_SIZE"), 50);
-        bufCacheSize->setRef(memSizeLim);
-        iParamContainer.init(bufCacheSize);
-        bufferCache = new BufferCache(iParamSetter, &iParamContainer);
+        BufferCacheSize *bufCacheSize = new BufferCacheSize(string("BUFFER_CACHE_SIZE"), 50, memSizeLim);
+        bufferCache = new BufferCache(bufCacheSize, iParamInitializer);
+
+        iParamContainer.insert(memoryManager->getIParams());
+        iParamContainer.insert(bufferCache->getIParams());
     }
 
     IParamContainer iParamContainer;
-    IParamTyped<int> *memSizeLim;
     MemoryManager *memoryManager;
-    BufferCacheSize *bufCacheSize;
     BufferCache *bufferCache;
 };
 
