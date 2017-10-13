@@ -9,11 +9,11 @@
 #include "IParam.hpp"
 #include "Module.hpp"
 #include "BufferCache.hpp"
+#include "MemoryManager.hpp"
 
 class ModuleFactory {
 public:
-    void boot(){
-
+    void boot() {
         //Instanciating IParam Container to store all the references for IParam objects
         map<string, string> tipFile;
         IParamSetter *iParamSetter = new IParamSetter(tipFile);
@@ -22,7 +22,7 @@ public:
         iParamContainer.init(memSizeLim);
         memoryManager = new MemoryManager(iParamSetter,&iParamContainer);
 
-        bufCacheSize = new BufferCacheSize(string("BUFFER_CACHE_SIZE"), 10);
+        bufCacheSize = new BufferCacheSize(string("BUFFER_CACHE_SIZE"), 50);
         bufCacheSize->setRef(memSizeLim);
         iParamContainer.init(bufCacheSize);
         bufferCache = new BufferCache(iParamSetter, &iParamContainer);

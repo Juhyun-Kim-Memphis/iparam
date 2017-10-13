@@ -11,10 +11,17 @@
 class BufferCacheSize : public IParamTyped<int> {
 public:
     BufferCacheSize(string name_, int value_)
-            : IParamTyped<int>(name_, value_) {}
+            : IParamTyped<int>(name_, value_), ref(NULL) {}
 
     void setValue(string in) {
-        int res = ref->value;
+
+        int res;
+        if(ref == NULL){
+            IParamTyped<int>::setValue(in);
+            return;
+        }
+
+        res = ref->value;
         stringstream ss(in);
         int inputVal;
         ss >> inputVal;
@@ -36,16 +43,31 @@ private:
 
 class BufferCache : public Module {
 public:
-    BufferCache(IParamSetter *iParamSetter, IParamContainer *ic = NULL)
+    BufferCache(IParamSetter *iParamSetter, IParamContainer *ic)
         : name(string("BUFFER_CACHE_NAME"), string("myBufferCache"))
     {
         //TODO: make this call to be unnecessary for concrete module;
         if(ic){
             size = (BufferCacheSize *)ic->getVal(string("BUFFER_CACHE_SIZE"));
+            if(size)
+                iParamSetter->setIParamIfPossible(*size);
+            else{
+                size = new BufferCacheSize(string("BUFFER_CACHE_SIZE"), 50);
+                iParamSetter->setIParamIfPossible(*size);
+                ic->init(size);
+            }
 
-            iParamSetter->setIParamIfPossible(*size);
             iParamSetter->setIParamIfPossible(name);
+            ic->init(&name);
         }
+    }
+
+    BufferCache(IParamSetter *iParamSetter)
+            : name(string("BUFFER_CACHE_NAME"), string("myBufferCache")) {
+        size = new BufferCacheSize(string("BUFFER_CACHE_SIZE"), 50);
+
+        iParamSetter->setIParamIfPossible(name);
+        iParamSetter->setIParamIfPossible(*size);
     }
 
     int getSize() {

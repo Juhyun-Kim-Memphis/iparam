@@ -41,6 +41,7 @@ class IParamSetter {
 public:
     IParamSetter(map<string, string> m) : iParamMap(m) {}
     void setIParamIfPossible(IParam &iparam);
+
     void applyAll(vector<IParam *> &iParams);
 
 private:
@@ -65,6 +66,7 @@ public:
             if(iParam->getName() == iParamName)
                 return iParam;
         }
+        return NULL;
     }
 
 //private:

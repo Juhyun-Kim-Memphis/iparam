@@ -9,12 +9,11 @@ void IParamSetter::setIParamIfPossible(IParam &iparam) {
 }
 
 void IParamSetter::applyAll(vector<IParam *> &iParams) {
-    for (vector<IParam *>::iterator it = iParams.begin() ; it != iParams.end(); ++it) {
-        IParam *iParam = *it;
+    for(IParam *iParam : iParams)
         setIParamIfPossible(*iParam);
-    }
 }
 
+// TODO: How to remove  IParamContainer:: ? cumbersome..
 void IParamContainer::setIParams(IParamSetter *setter) {
     setter->applyAll(iParams);
 }
