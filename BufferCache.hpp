@@ -13,8 +13,8 @@ public:
     BufferCacheSize(string name_, int value_, IParamTyped<int> *refIn)
             : IParamTyped<int>(name_, value_), ref(refIn) {}
 
-    void setValue(string in) {
-
+    void setValue(string in) override {
+        //TODO: refactor this/
         int res;
         if(ref == NULL){
             IParamTyped<int>::setValue(in);
@@ -25,19 +25,14 @@ public:
         stringstream ss(in);
         int inputVal;
         ss >> inputVal;
-        if(res > inputVal){
-            IParamTyped<int>::setValue(in);
-        } else {
-            std::cout << " Fail to setValue \n";
-        }
-    }
 
-    void setRef(IParamTyped<int> *in){
-        this->ref = in;
+        if(res > inputVal)
+            IParamTyped<int>::setValue(in);
+        else
+            std::cout << " Fail to setValue \n";
     }
 
 private:
-
     IParamTyped<int> *ref;
 };
 
