@@ -1,7 +1,3 @@
-//
-// Created by juhyun on 17. 10. 12.
-//
-
 #ifndef IPARAM_BUFFERCACHE_HPP
 #define IPARAM_BUFFERCACHE_HPP
 
@@ -11,46 +7,37 @@
 class BufferCacheSize : public IParamTyped<int> {
 public:
     BufferCacheSize(string name_, int value_, IParamTyped<int> *refIn)
-            : IParamTyped<int>(name_, value_), ref(refIn) {}
+            : IParamTyped<int>(name_, value_), memorySizeLimit(refIn) {}
 
     void setValue(string in) override {
-        //TODO: refactor this/
-        int res;
-        if(ref == NULL){
-            IParamTyped<int>::setValue(in);
-            return;
-        }
+        int newBufferCacheSize = stringToValueType(in);
 
-        res = ref->value;
-        stringstream ss(in);
-        int inputVal;
-        ss >> inputVal;
-
-        if(res > inputVal)
+        if(isSmallerThanMemSizeLimit(newBufferCacheSize))
             IParamTyped<int>::setValue(in);
         else
-            std::cout << " Fail to setValue \n";
+            throw exception();
     }
 
 private:
-    IParamTyped<int> *ref;
+    IParamTyped<int> *memorySizeLimit;
+    bool isSmallerThanMemSizeLimit(int bufferCacheSize) {
+        int memSizeLimit = memorySizeLimit->value;
+        return bufferCacheSize < memSizeLimit;
+    }
 };
 
 class BufferCache : public Module {
 public:
-
     BufferCache(BufferCacheSize *in, IParamSetter &initializer)
-        : size(in), name(string("BUFFER_CACHE_NAME"), string("myBufferCache")) {
+            : size(in), name(string("BUFFER_CACHE_NAME"), string("myBufferCache")) {
         //TODO: make this call to be unnecessary for concrete module;
         initializer.setIParamIfPossible(*size);
         initializer.setIParamIfPossible(name);
     }
 
     explicit BufferCache(IParamSetter &initializer)
-            : name(string("BUFFER_CACHE_NAME"), string("myBufferCache"))  {
-        size = new BufferCacheSize(string("BUFFER_CACHE_SIZE"), 50, NULL);
-        //TODO: remove null argument here.
-
+            : name(string("BUFFER_CACHE_NAME"), string("myBufferCache")) {
+        size = new IParamTyped<int>(string("BUFFER_CACHE_SIZE"), 50);
         initializer.setIParamIfPossible(name);
         initializer.setIParamIfPossible(*size);
     }
@@ -71,7 +58,7 @@ public:
     }
 
 private:
-    BufferCacheSize *size;
+    IParamTyped<int> *size;
     IParamTyped<string> name;
 };
 

@@ -1,7 +1,3 @@
-//
-// Created by user on 2017-10-11.
-//
-
 #ifndef IPARAM_MODULE_HPP
 #define IPARAM_MODULE_HPP
 

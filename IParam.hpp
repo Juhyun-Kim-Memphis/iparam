@@ -28,11 +28,18 @@ public:
     IParamTyped(string name_, T value_) : IParam(name_), value(value_) {}
 
     void setValue(string in) {
-        stringstream ss(in);
-        ss >> value;
+        value = stringToValueType(in);
     }
 
     T value;
+
+protected:
+    T stringToValueType(string in) {
+        T result;
+        stringstream ss(in);
+        ss >> result;
+        return result;
+    }
 };
 
 

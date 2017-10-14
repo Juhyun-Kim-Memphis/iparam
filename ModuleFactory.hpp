@@ -1,7 +1,3 @@
-//
-// Created by juhyun on 17. 10. 12.
-//
-
 #ifndef IPARAM_MODULEFACTORY_HPP
 #define IPARAM_MODULEFACTORY_HPP
 

@@ -79,7 +79,7 @@ TEST_CASE("test dependent condition check by Module") {
 
     alterSystemSetParsed["BUFFER_CACHE_SIZE"] = string("999");
     alterSystemSet = new IParamSetter(alterSystemSetParsed);
-    moduleFactory.iParamContainer.setIParams(alterSystemSet);
+    REQUIRE_THROWS(moduleFactory.iParamContainer.setIParams(alterSystemSet));
     REQUIRE(moduleFactory.bufferCache->getSize() == 40);
     REQUIRE(moduleFactory.iParamContainer.iParams.size() == 3);
     //TODO: errormsg

@@ -1,7 +1,3 @@
-//
-// Created by user on 2017-10-13.
-//
-
 #ifndef IPARAM_MEMORYMANAGER_HPP
 #define IPARAM_MEMORYMANAGER_HPP
 
