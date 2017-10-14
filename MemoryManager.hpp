@@ -7,14 +7,12 @@
 class MemoryManager : public Module {
 public:
     MemoryManager(IParamTyped<int> *memSizeLimInput, IParamSetter &initializer)
-            : memorySizeLimit(memSizeLimInput)
-    {
-        //TODO: make this call to be unnecessary for concrete module;
+            : memorySizeLimit(memSizeLimInput) {
         initializer.setIParamIfPossible(*memorySizeLimit);
         memorySizeLimit = new IParamTyped<int>(string("MEMORY_SIZE_LIMIT"), 100);
     }
 
-    MemoryManager(IParamSetter &initializer) {
+    explicit MemoryManager(IParamSetter &initializer) {
         memorySizeLimit = new IParamTyped<int>(string("MEMORY_SIZE_LIMIT"), 100);
         initializer.setIParamIfPossible(*memorySizeLimit);
     }

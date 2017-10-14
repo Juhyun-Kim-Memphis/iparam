@@ -82,7 +82,7 @@ TEST_CASE("test dependent condition check by Module") {
     REQUIRE_THROWS(moduleFactory.iParamContainer.setIParams(alterSystemSet));
     REQUIRE(moduleFactory.bufferCache->getSize() == 40);
     REQUIRE(moduleFactory.iParamContainer.iParams.size() == 3);
-    //TODO: errormsg
+    //TODO: errormsg in exception object
 }
 
 // TODO: bootstrapper (ModuleFactory) elaborate
@@ -90,6 +90,6 @@ TEST_CASE("test dependent condition check by Module") {
 // TODO: Module들이 iparam container한테 iparam 각출하는 코드를 concrete modoule class가 짜지 않아도 될 방법은 없나?
 // TODO: doxygen으로 모든 IPARAM목록 띄워주는 법
 // TODO: to document @desc, @range, @recommend, @syntax
-// TODO: IDE에서 todo list, static diagram 그리기, run with coverage.
+// TODO: IDE에서 todo list, run with coverage.
 
 // To Prove: customizablity of IParam, container for all iparam
