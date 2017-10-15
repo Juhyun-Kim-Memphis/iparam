@@ -23,14 +23,12 @@ TEST_CASE("test module insert and Default IParam value of modules") {
 
 TEST_CASE("test default value and alter system set") {
     map<string, string> emptyTipFile;
-    IParamContainer iParamContainer;
-
     IParamSetter iParamSetter(emptyTipFile);
-    MemoryManager *memoryManager = new MemoryManager(iParamSetter);
-    BufferCache *bufferCache = new BufferCache(iParamSetter);
+    ModuleFactory *tlite = new TLiteModuleFactory(iParamSetter);
 
-    iParamContainer.insert(memoryManager->getIParams());
-    iParamContainer.insert(bufferCache->getIParams());
+    BufferCache *bufferCache = tlite->getBufferCache();
+    MemoryManager *memoryManager = tlite->getMemoryManager();
+    IParamContainer *iParamContainer = tlite->getIParamContainer();
 
     REQUIRE(memoryManager->getMemorySizeLimit() == 100);
     REQUIRE(bufferCache->getSize() == 50);
@@ -40,7 +38,7 @@ TEST_CASE("test default value and alter system set") {
     alterSystemSetParsed["BUFFER_CACHE_SIZE"] = string("999");
     alterSystemSetParsed["BUFFER_CACHE_NAME"] = string("other_name");
     IParamSetter *alterSystemSet = new IParamSetter(alterSystemSetParsed);
-    iParamContainer.setIParams(alterSystemSet);
+    iParamContainer->setIParams(alterSystemSet);
 
     REQUIRE(memoryManager->getMemorySizeLimit() == 100);
     REQUIRE(bufferCache->getSize() == 999);
@@ -64,24 +62,30 @@ TEST_CASE("test dependent condition check") {
 }
 
 TEST_CASE("test dependent condition check by Module") {
-    ModuleFactory moduleFactory;
-    moduleFactory.boot();
+    /* Tibero booting */
+    ModuleFactory *tibero = new TiberoModuleFactory();
+    BufferCache *bufferCache = tibero->getBufferCache();
+    MemoryManager *memoryManager = tibero->getMemoryManager();
+    IParamContainer *iParamContainer = tibero->getIParamContainer();
 
-    REQUIRE(moduleFactory.bufferCache->getSize() == 50);
-    REQUIRE(moduleFactory.memoryManager->getMemorySizeLimit() == 100);
+    /* check IParam default  values */
+    REQUIRE(bufferCache->getSize() == 50);
+    REQUIRE(memoryManager->getMemorySizeLimit() == 100);
 
+    /* change BUFFER_CACHE_SIZE to 40 (valid change) by alterSystemSet. */
     map<string, string> alterSystemSetParsed;
     alterSystemSetParsed["BUFFER_CACHE_SIZE"] = string("40");
     IParamSetter *alterSystemSet = new IParamSetter(alterSystemSetParsed);
-    moduleFactory.iParamContainer.setIParams(alterSystemSet);
+    REQUIRE_NOTHROW(iParamContainer->setIParams(alterSystemSet));
+    REQUIRE(bufferCache->getSize() == 40);
 
-    REQUIRE(moduleFactory.bufferCache->getSize() == 40);
-
+    /* try to change BUFFER_CACHE_SIZE to 999 (NOT allowed) */
     alterSystemSetParsed["BUFFER_CACHE_SIZE"] = string("999");
     alterSystemSet = new IParamSetter(alterSystemSetParsed);
-    REQUIRE_THROWS(moduleFactory.iParamContainer.setIParams(alterSystemSet));
-    REQUIRE(moduleFactory.bufferCache->getSize() == 40);
-    REQUIRE(moduleFactory.iParamContainer.iParams.size() == 3);
+    /* check this attempt throw exception and change doesn't happen. */
+    REQUIRE_THROWS(iParamContainer->setIParams(alterSystemSet));
+    REQUIRE(bufferCache->getSize() == 40);
+    REQUIRE(iParamContainer->iParams.size() == 3);
     //TODO: errormsg in exception object
 }
 

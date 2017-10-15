@@ -9,8 +9,20 @@
 
 class ModuleFactory {
 public:
-    void boot() {
-        //Instantiating IParam Container to store all the references for IParam objects
+    MemoryManager *getMemoryManager() { return  memoryManager;}
+    BufferCache *getBufferCache() { return  bufferCache;}
+    IParamContainer *getIParamContainer() { return  iParamContainer;}
+
+protected:
+    MemoryManager *memoryManager;
+    BufferCache *bufferCache;
+    IParamContainer *iParamContainer;
+};
+
+class TiberoModuleFactory : public ModuleFactory {
+public:
+    TiberoModuleFactory() {
+        // load tip file and parse to make map<string, string> object.
         map<string, string> tipFile;
         IParamSetter iParamInitializer(tipFile);
 
@@ -20,13 +32,25 @@ public:
         BufferCacheSize *bufCacheSize = new BufferCacheSize(string("BUFFER_CACHE_SIZE"), 50, memSizeLim);
         bufferCache = new BufferCache(bufCacheSize, iParamInitializer);
 
-        iParamContainer.insert(memoryManager->getIParams());
-        iParamContainer.insert(bufferCache->getIParams());
+        //Instantiating IParam Container to store all the references for IParam objects
+        iParamContainer = new IParamContainer();
+        iParamContainer->insert(memoryManager->getIParams());
+        iParamContainer->insert(bufferCache->getIParams());
+    }
+};
+
+class TLiteModuleFactory : public ModuleFactory {
+public:
+    TLiteModuleFactory(IParamSetter iParamInitializer) {
+        memoryManager = new MemoryManager(iParamInitializer);
+        bufferCache = new BufferCache(iParamInitializer);
+        iParamContainer = new IParamContainer();
+        iParamContainer->insert(memoryManager->getIParams());
+        iParamContainer->insert(bufferCache->getIParams());
     }
 
-    IParamContainer iParamContainer;
-    MemoryManager *memoryManager;
-    BufferCache *bufferCache;
+private:
+    TLiteModuleFactory(){};
 };
 
 
