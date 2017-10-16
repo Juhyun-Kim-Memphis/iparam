@@ -48,12 +48,15 @@ TEST_CASE("test default value and alter system set") {
 
 bool isBigger200(int val){ return val > 200; }
 TEST_CASE("test ConditionedIParam condition check") {
+    /** @ingroup IParam */
     IParam *iParam = new ConditionedIParam<isBigger200>(string("TEST_VAL1"), 201);
     REQUIRE(iParam->isValid());
 }
 
 TEST_CASE("test dependent condition check") {
+    /** @ingroup IParam */
     IParamTyped<int> depended(string("SMALLER"), 100);
+    /** @ingroup IParam */
     DependingIParam *depending = new DependingIParam(string("BIGGER"), 101, depended);
 
     REQUIRE(depending->isValid());

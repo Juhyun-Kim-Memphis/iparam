@@ -58,8 +58,15 @@ public:
     }
 
 private:
+    /** @addtogroup IParam
+     **  @{ */
+    /** @brief BUFFER_CACHE_SIZE: size of this buffer cache.\n
+     *  default: 50
+     * */
     IParamTyped<int> *size;
+    /** name of this buffer cache. */
     IParamTyped<string> name;
+    /** @} */
 };
 
 

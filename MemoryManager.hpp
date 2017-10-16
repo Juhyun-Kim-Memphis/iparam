@@ -28,6 +28,7 @@ public:
     }
 
 private:
+    /** @ingroup IParam */
     IParamTyped<int> *memorySizeLimit;
 };
 

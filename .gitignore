@@ -1,3 +1,9 @@
+#doxgen
+doxygen_output
+
+.idea
+cmake-build-debug
+
 # Prerequisites
 *.d
 

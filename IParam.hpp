@@ -8,6 +8,8 @@
 
 using namespace std;
 
+/** @defgroup IParam Initial Parameter */
+
 class IParam {
 public:
     IParam(string name_) : name(name_) {}
@@ -91,6 +93,7 @@ public:
     }
 
 private:
+    /** @ingroup IParam */
     const IParamTyped<int> &dependedIParam;
 };
 
